@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="FitPlanner - Elite Training System para planejamento de treinos, dieta e progresso." />
+  <meta name="theme-color" content="#0A0A0C" />
+  <title>FitPlanner — Elite Training System</title>
+  
+  <!-- Preconnect para otimizar carregamento de fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" rel="stylesheet" />
+  
+  <!-- React com versão específica e integridade -->
+  <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js" integrity="sha384-7Xyp9xBL3pJYgJhwVBhWXXQqBBXKXJfKx1MFBuVGGJZyxGJ6nZbxEVhLGEGCZg9"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js" integrity="sha384-6j/zcG7hJXvvVVJQpXbJJnCCBFMIqKqJXnHLMpWXQzwpBpWLbXPQbqXPLMvfZLYKU"></script>
+  
+  <!-- Babel Standalone para JSX (otimizado) -->
+  <script src="https://unpkg.com/@babel/standalone@7.23.5/babel.min.js"></script>
+  
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html, body, #root {
+      height: 100%;
+    }
+    
+    body {
+      background: #0A0A0C;
+      color: #F0F0F0;
+      font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow: hidden;
+    }
+    
+    /* Scrollbar customizado */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0A0A0C;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2A2A38;
+      border-radius: 2px;
+    }
+    
+    /* Elementos interativos */
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-family: inherit;
+    }
+    
+    input, textarea {
+      outline: none;
+      font-family: inherit;
+    }
+    
+    /* ===== LAYOUT PRINCIPAL ===== */
+    #root {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: #0D0D10;
+      border-right: 1px solid #1A1A22;
+      display: flex;
+      flex-direction: column;
+      z-index: 200;
+      transition: transform 0.3s ease;
+    }
+    
+    .sidebar-logo {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid #1A1A22;
+    }
+    
+    .sidebar-logo-tag {
+      font-size: 8px;
+      letter-spacing: 4px;
+      color: #333;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    
+    .sidebar-logo-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 2px;
+      color: #F0F0F0;
+      line-height: 1;
+    }
+    
+    .sidebar-logo-name span {
+      color: #E8523A;
+    }
+    
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 10px;
+      overflow-y: auto;
+    }
+    
+    .nav-section-label {
+      font-size: 8px;
+      letter-spacing: 3px;
+      color: #2A2A38;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0 10px;
+      margin: 12px 0 6px;
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #3A3A55;
+      text-transform: uppercase;
+      transition: all 0.15s ease;
+      width: 100%;
+      margin-bottom: 2px;
+    }
+    
+    .nav-item:hover {
+      background: #14141C;
+      color: #888;
+    }
+    
+    .nav-item.active {
+      background: #16161E;
+      color: #F0F0F0;
+    }
+    
+    .nav-item.active .nav-dot {
+      background: #E8523A;
+    }
+    
+    .nav-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #2A2A38;
+      flex-shrink: 0;
+      transition: background 0.15s ease;
+      margin-left: auto;
+    }
+    
+    .nav-icon {
+      font-size: 15px;
+      width: 20px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    
+    .sidebar-footer {
+      border-top: 1px solid #1A1A22;
+      padding: 14px 16px;
+    }
+    
+    .user-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #E8523A, #C44FD8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    
+    .user-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #888;
+    }
+    
+    .user-plan {
+      font-size: 9px;
+      color: #333;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    
+    .main-area {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: #0A0A0C;
+    }
+    
+    /* ===== MOBILE NAVIGATION ===== */
+    .mobile-topbar {
+      display: none;
+      background: #0D0D10;
+      border-bottom: 1px solid #1A1A22;
+      padding: 14px 20px;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 300;
+    }
+    
+    .mobile-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: #F0F0F0;
+    }
+    
+    .mobile-logo span {
+      color: #E8523A;
+    }
+    
+    .mobile-bottomnav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #0D0D10;
+      border-top: 1px solid #1A1A22;
+      padding: 8px 0 12px;
+      z-index: 300;
+      justify-content: space-around;
+    }
+    
+    .mobile-nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 4px 12px;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #333;
+      transition: color 0.15s ease;
+    }
+    
+    .mobile-nav-btn.active {
+      color: #E8523A;
+    }
+    
+    .mobile-nav-icon {
+      font-size: 18px;
+    }
+    
+    /* ===== PAGE SECTIONS ===== */
+    .page {
+      min-height: 100vh;
+    }
+    
+    .dash-header {
+      background: #0D0D10;
+      border-bottom: 1px solid #1A1A22;
+      padding: 28px 28px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .dash-header-tag {
+      font-size: 9px;
+      letter-spacing: 4px;
+      color: #333;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    
+    .dash-header-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      letter-spacing: 2px;
+      color: #F0F0F0;
+      line-height: 1;
+    }
+    
+    .dash-header-sub {
+      font-size: 12px;
+      color: #444;
+      margin-top: 5px;
+    }
+    
+    .dash-body {
+      padding: 24px 28px 80px;
+    }
+    
+    /* ===== GRID E CARDS ===== */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .metric-card {
+      background: #14141C;
+      border: 1px solid #1E1E2A;
+      border-radius: 14px;
+      padding: 18px 16px;
+      transition: border-color 0.2s ease;
+    }
+    
+    .metric-card:hover {
+      border-color: #2A2A38;
+    }
+    
+    .metric-icon {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    
+    .metric-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: #444;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    
+    .metric-value {
+      font-size: 22px;
+      font-weight: 900;
+      color: #F0F0F0;
+      letter-spacing: -1px;
+    }
+    
+    .metric-sub {
+      font-size: 10px;
+      color: #3A3A55;
+      margin-top: 3px;
+    }
+    
+    .metric-bar {
+      height: 3px;
+      background: #1A1A22;
+      border-radius: 2px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    
+    .metric-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.8s ease;
+    }
+    
+    .dash-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .dash-card {
+      background: #14141C;
+      border: 1px solid #1E1E2A;
+      border-radius: 14px;
+      padding: 20px;
+    }
+    
+    .dash-card-title {
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: #444;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    
+    .dash-card-big {
+      font-size: 28px;
+      font-weight: 900;
+      color: #F0F0F0;
+      letter-spacing: -1px;
+    }
+    
+    /* ===== SEMANA ===== */
+    .week-strip {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .week-day {
+      flex: 1;
+      background: #14141C;
+      border: 1px solid #1E1E2A;
+      border-radius: 10px;
+      padding: 10px 6px;
+      text-align: center;
+    }
+    
+    .week-day.done {
+      border-color: #2EAF6B44;
+      background: #2EAF6B11;
+    }
+    
+    .week-day.today {
+      border-color: #E8523A;
+    }
+    
+    .week-day-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #444;
+      text-transform: uppercase;
+    }
+    
+    .week-day.today .week-day-label {
+      color: #E8523A;
+    }
+    
+    .week-day-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #1E1E2A;
+      margin: 6px auto 0;
+    }
+    
+    .week-day.done .week-day-dot {
+      background: #2EAF6B;
+    }
+    
+    .week-day.today .week-day-dot {
+      background: #E8523A;
+    }
+    
+    /* ===== ÁGUA ===== */
+    .water-cups {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    
+    .water-cup {
+      width: 32px;
+      height: 38px;
+      background: #16161E;
+      border: 1px solid #1E1E2A;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    
+    .water-cup.filled {
+      background: #1A3A55;
+      border-color: #3A7BE8;
+    }
+    
+    /* ===== EXERCÍCIO ===== */
+    .exercise-input {
+      background: #16161E;
+      border: 1px solid #1E1E2A;
+      border-radius: 4px;
+      color: #DDD;
+      font-size: 10px;
+      padding: 2px 6px;
+      width: 50px;
+      transition: border-color 0.2s ease;
+    }
+    
+    .exercise-input:focus {
+      border-color: #E8523A;
+    }
+    
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: 8px;
+      margin-top: 10px;
+      background: #000;
+    }
+    
+    .video-container iframe,
+    .video-container video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    /* ===== BADGE ===== */
+    .elite-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #E8523A;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #fff;
+      text-transform: uppercase;
+    }
+    
+    /* ===== RESPONSIVIDADE ===== */
+    @media (max-width: 1100px) {
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        overflow: auto;
+      }
+      
+      #root {
+        flex-direction: column;
+        overflow: visible;
+        height: auto;
+        min-height: 100vh;
+      }
+      
+      .sidebar {
+        display: none;
+      }
+      
+      .mobile-topbar {
+        display: flex;
+      }
+      
+      .mobile-bottomnav {
+        display: flex;
+      }
+      
+      .main-area {
+        overflow: visible;
+        padding-bottom: 70px;
+      }
+      
+      .dash-header {
+        padding: 20px 16px 16px;
+        position: relative;
+      }
+      
+      .dash-body {
+        padding: 16px 16px 20px;
+      }
+      
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+      
+      .dash-grid-2 {
+        grid-template-columns: 1fr;
+      }
+      
+      .dash-header-title {
+        font-size: 28px;
+      }
+      
+      .week-strip {
+        gap: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+    
+    /* ============================================================
+       DADOS ESTRUTURADOS - Separados da Lógica
+       ============================================================ */
+    
+    const NAV = [
+      { id: "dashboard", label: "Dashboard", icon: "📊", mIcon: "📊" },
+      { id: "treino", label: "Treino", icon: "💪", mIcon: "💪" },
+      { id: "dieta", label: "Dieta", icon: "🍽️", mIcon: "🍽️" },
+      { id: "progresso", label: "Progresso", icon: "📈", mIcon: "📈" },
+      { id: "perfil", label: "Perfil", icon: "👤", mIcon: "👤" },
+    ];
+    
+    const PLAN_DATA = {
+      days: [
+        {
+          id: "seg", label: "SEG", fullLabel: "SEGUNDA",
+          title: "PEITO + TRÍCEPS", tag: "Empurrar",
+          color: "#E8523A", duration: "~55 min",
+          sections: [
+            { name: "AQUECIMENTO", icon: "🔥", exercises: [
+              { id: "seg-aq-1", name: "Esteira inclinada leve", sets: "5 min", reps: "—", rest: "—", note: "Eleve a FC antes de começar" },
+            ]},
+            { name: "PEITO", icon: "💪", exercises: [
+              { id: "seg-pe-1", name: "Supino Inclinado Halter", sets: "4", reps: "8–10", rest: "60s", note: "Composto prioritário. Controle na descida (2s)" },
+              { id: "seg-pe-2", name: "Supino Máquina Convergente", sets: "4", reps: "10–12", rest: "50s", note: "Esprema no topo — pico de contração" },
+            ]},
+          ]
+        },
+      ],
+      weekProgression: [
+        { week: "SEMANA 1", dias: "Dias 1–5", focus: "Adaptação e Base", detail: "Volume moderado, foco em técnica perfeita e aprendizado neuromuscular", cor: "#E8523A" },
+        { week: "SEMANA 2", dias: "Dias 6–10", focus: "Intensidade Crescente", detail: "Aumento de carga e volume. Introduzir técnicas avançadas com moderação", cor: "#E8A23A" },
+      ],
+      nutrition: [
+        { icon: "🥩", label: "Proteína", value: "2g / kg corporal", detail: "Distribuídas em 4–5 refeições ao longo do dia" },
+        { icon: "💧", label: "Hidratação", value: "3–4L / dia", detail: "Mais nos dias de treino — urina clara = hidratado" },
+      ]
+    };
+    
+    /* ============================================================
+       COMPONENTES REUTILIZÁVEIS
+       ============================================================ */
+    
+    function ProgressRing({ value, max, color, size = 64 }) {
+      const r = (size / 2) - 6;
+      const circ = 2 * Math.PI * r;
+      const fill = circ - (value / max) * circ;
+      
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-label={`${value}% progresso`}>
+          <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#1E1E2A" strokeWidth="5"/>
+          <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth="5"
+            strokeDasharray={circ} strokeDashoffset={fill}
+            strokeLinecap="round" transform={`rotate(-90 ${size/2} ${size/2})`}
+            style={{ transition: "stroke-dashoffset 1s ease" }}/>
+          <text x={size/2} y={size/2+1} textAnchor="middle" dominantBaseline="middle" fill="#F0F0F0" fontSize="11" fontWeight="900">
+            {value}%
+          </text>
+        </svg>
+      );
+    }
+    
+    /* ============================================================
+       DASHBOARD
+       ============================================================ */
+    
+    function DashboardPage() {
+      const [water, setWater] = useState(5);
+      const days = ["SEG", "TER", "QUA", "QUI", "SEX", "SAB", "DOM"];
+      const done = [0, 1, 2];
+      const today = 3;
+      
+      const metrics = [
+        { icon: "⚡", label: "Treinos", value: "12", sub: "este mês", bar: 0.4, color: "#E8523A" },
+        { icon: "🔥", label: "Kcal queimadas", value: "8.4k", sub: "acumulado", bar: 0.6, color: "#E8A23A" },
+        { icon: "💪", label: "Volume total", value: "148t", sub: "carga levantada", bar: 0.5, color: "#3A7BE8" },
+        { icon: "😴", label: "Recuperação", value: "87%", sub: "média semanal", bar: 0.87, color: "#2EAF6B" },
+      ];
+      
+      const goals = [
+        { text: "Completar 4 semanas do plano", done: false },
+        { text: "Atingir 70kg com 14% BF", done: false },
+        { text: "Barra fixa sem assistência", done: false },
+        { text: "Cardio final todos os treinos", done: true },
+        { text: "3L de água por dia", done: true },
+      ];
+      
+      return (
+        <section className="page">
+          <header className="dash-header">
+            <div className="dash-header-tag">FitPlanner · Elite</div>
+            <h1 className="dash-header-title">Dashboard</h1>
+            <p className="dash-header-sub">Bem-vindo de volta — continue de onde parou 🔥</p>
+          </header>
+          
+          <div className="dash-body">
+            {/* Métricas */}
+            <div className="metrics-grid">
+              {metrics.map((m, i) => (
+                <article className="metric-card" key={i}>
+                  <div className="metric-icon">{m.icon}</div>
+                  <div className="metric-label">{m.label}</div>
+                  <div className="metric-value">{m.value}</div>
+                  <div className="metric-sub">{m.sub}</div>
+                  <div className="metric-bar">
+                    <div className="metric-bar-fill" style={{ width: `${m.bar * 100}%`, background: m.color }} />
+                  </div>
+                </article>
+              ))}
+            </div>
+            
+            {/* Semana */}
+            <article className="dash-card" style={{ marginBottom: "12px" }}>
+              <h2 className="dash-card-title">Semana atual</h2>
+              <div className="week-strip">
+                {days.map((d, i) => (
+                  <div key={i} className={`week-day${done.includes(i) ? " done" : ""}${i === today ? " today" : ""}`}>
+                    <div className="week-day-label">{d}</div>
+                    <div className="week-day-dot" />
+                  </div>
+                ))}
+              </div>
+              <p style={{ fontSize: "11px", color: "#3A3A55" }}>3 de 5 treinos concluídos esta semana</p>
+            </article>
+            
+            <div className="dash-grid-2">
+              {/* Água */}
+              <article className="dash-card">
+                <h2 className="dash-card-title">💧 Água hoje</h2>
+                <div style={{ fontSize: "22px", fontWeight: "900", color: "#3A7BE8", letterSpacing: "-1px", marginBottom: "8px" }}>
+                  {water * 0.3}L <span style={{ fontSize: "12px", color: "#444", fontWeight: "600" }}>/ 3L</span>
+                </div>
+                <div className="water-cups">
+                  {Array.from({ length: 10 }).map((_, i) => (
+                    <button key={i} className={`water-cup${i < water ? " filled" : ""}`} onClick={() => setWater(i < water ? i : i + 1)} aria-label={`Copo ${i + 1}`}>
+                      {i < water ? "💧" : "○"}
+                    </button>
+                  ))}
+                </div>
+              </article>
+              
+              {/* Progresso visual */}
+              <article className="dash-card">
+                <h2 className="dash-card-title">Progresso do plano</h2>
+                <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+                  <div style={{ textAlign: "center" }}>
+                    <ProgressRing value={40} max={100} color="#E8523A" size={64} />
+                    <div style={{ fontSize: "9px", color: "#444", letterSpacing: "1px", marginTop: "6px", textTransform: "uppercase" }}>Geral</div>
+                  </div>
+                  <div style={{ textAlign: "center" }}>
+                    <ProgressRing value={60} max={100} color="#2EAF6B" size={64} />
+                    <div style={{ fontSize: "9px", color: "#444", letterSpacing: "1px", marginTop: "6px", textTransform: "uppercase" }}>Dieta</div>
+                  </div>
+                  <div style={{ textAlign: "center" }}>
+                    <ProgressRing value={87} max={100} color="#3A7BE8" size={64} />
+                    <div style={{ fontSize: "9px", color: "#444", letterSpacing: "1px", marginTop: "6px", textTransform: "uppercase" }}>Sono</div>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+      );
+    }
+    
+    /* ============================================================
+       APLICAÇÃO PRINCIPAL
+       ============================================================ */
+    
+    function App() {
+      const [page, setPage] = useState("dashboard");
+      
+      const renderPage = () => {
+        if (page === "dashboard") return <DashboardPage />;
+        return <DashboardPage />; // Placeholder para outras páginas
+      };
+      
+      return (
+        <>
+          {/* Sidebar Desktop */}
+          <aside className="sidebar" role="navigation">
+            <div className="sidebar-logo">
+              <div className="sidebar-logo-tag">Elite Training System</div>
+              <h1 className="sidebar-logo-name">Fit<span>Planner</span></h1>
+            </div>
+            <nav className="sidebar-nav">
+              <div className="nav-section-label">Menu Principal</div>
+              {NAV.map(n => (
+                <button key={n.id} className={`nav-item${page === n.id ? " active" : ""}`} onClick={() => setPage(n.id)} aria-current={page === n.id ? "page" : undefined}>
+                  <span className="nav-icon">{n.icon}</span>
+                  {n.label}
+                  <div className="nav-dot" />
+                </button>
+              ))}
+              <div className="nav-section-label" style={{ marginTop: "20px" }}>Plano Atual</div>
+              <div style={{ background: "#16161E", border: "1px solid #E8523A30", borderRadius: "10px", padding: "12px 14px", margin: "0 2px" }}>
+                <div style={{ fontSize: "8px", letterSpacing: "2px", color: "#E8523A", fontWeight: "700", textTransform: "uppercase", marginBottom: "4px" }}>Elite 30D</div>
+                <div style={{ fontSize: "12px", fontWeight: "800", color: "#CCC", marginBottom: "6px" }}>Semana 2 · Dia 9</div>
+                <div style={{ height: "4px", background: "#1A1A22", borderRadius: "2px", overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: "40%", background: "linear-gradient(90deg,#E8523A,#C44FD8)", borderRadius: "2px" }} />
+                </div>
+                <div style={{ fontSize: "9px", color: "#444", marginTop: "5px" }}>40% concluído</div>
+              </div>
+            </nav>
+            <footer className="sidebar-footer">
+              <div className="user-chip">
+                <div className="user-avatar">E</div>
+                <div>
+                  <div className="user-name">Elite Athlete</div>
+                  <div className="user-plan">Plano Elite</div>
+                </div>
+              </div>
+            </footer>
+          </aside>
+          
+          {/* Mobile Top Bar */}
+          <header className="mobile-topbar">
+            <h1 className="mobile-logo">Fit<span>Planner</span></h1>
+            <div className="elite-badge" style={{ fontSize: "8px", padding: "3px 8px" }}>Elite 30D</div>
+          </header>
+          
+          {/* Main Content */}
+          <main className="main-area">
+            {renderPage()}
+          </main>
+          
+          {/* Mobile Bottom Navigation */}
+          <nav className="mobile-bottomnav" role="navigation">
+            {NAV.map(n => (
+              <button key={n.id} className={`mobile-nav-btn${page === n.id ? " active" : ""}`} onClick={() => setPage(n.id)} aria-current={page === n.id ? "page" : undefined}>
+                <div className="mobile-nav-icon">{n.mIcon}</div>
+                {n.label}
+              </button>
+            ))}
+          </nav>
+        </>
+      );
+    }
+    
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
